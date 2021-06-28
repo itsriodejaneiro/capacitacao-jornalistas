@@ -92,8 +92,8 @@ ntweets
 
 # Calcular a porcentagem de cada um
 library(scales)
-percent(ntweets/ntweets)
-percent(nretweets/ntweets)
+percent(ntweets/n_tweets)
+percent(nretweets/n_tweets)
 
 # 10) Apresentar uma visualização gráfica da evolução desses tweets no tempo,
 # indicando o dia com mais tweets contendo a hashtag.
