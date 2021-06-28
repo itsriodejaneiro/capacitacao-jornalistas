@@ -5,6 +5,7 @@ paleta_its <- c("#A3248B","#54318C","#255C8E","#00A6B7","#E1F1FD", "#8a8a8a")
 # 0. Pacotes -----------------------------------------------------------------
 install.packages('igraph')
 install.packages('ggraph')
+install.packages('readr')
 install.packages('tidyverse')
 
 library('igraph')
@@ -16,13 +17,13 @@ library('scales')
 
 # Leitura das bases ----------------------------------------------------
 
-base <- read_csv("Dados/all_#FechadoComBolsonaro2022_2021-06-14 00:00:00_1623963801.csv",
+base <- read_csv("./capacitacao-jornalistas-main/Dados/all_#FechadoComBolsonaro2022_2021-06-14 00:00:00_1623963801.csv",
                  col_types = cols(.default = "c"))
 
-base_pegabot <- read_csv("Dados/Handles-.fechadocombolsonaro2022-1623963801-resultados.csv")
+base_pegabot <- read_csv("./capacitacao-jornalistas-main/Dados/Handles-.fechadocombolsonaro2022-1623963801-resultados.csv")
 
 # Verificar quais perfis são 'bots' (+70%)
-base_pegabot <- resultados %>% 
+base_pegabot <- base_pegabot %>% 
   mutate(Resultado = cut(x = `Análise Total`, 
                          breaks = c(0,.70, Inf),
                          labels = c("Baixa Probabilidade",
@@ -34,7 +35,7 @@ base_pegabot <- resultados %>%
 ## Vamos passar o tweet por uma regex para extrair o autor do tweet original
 # Testando:
 str_match('RT @bolsomito_2: @taoquei1 Vem voto auditavel #FechadoComBolsonaro2022', 
-"(RT|via)((?:[[:blank:]:]\\W*@\\w+))")
+          "(RT|via)((?:[[:blank:]:]\\W*@\\w+))")
 
 # Agora sim, vamos construir uma tabela com os RTs
 # indicando o usuário autor do tweet e o usuário que fez o RT
@@ -65,7 +66,7 @@ summary(rt_graph)
 
 # Vamos criar uma tabela com essa info
 # a função degree_distribution() já faz esse cálculo
-dist_grau <- data_frame(y = degree_distribution(rt_graph), x = 1:length(y))
+dist_grau <- data.frame(y = degree_distribution(rt_graph), x = 1:length(degree_distribution(rt_graph)))
 
 # Plot do resultado
 ggplot(dist_grau) +
@@ -85,25 +86,25 @@ grau_in <- data.frame(screen_name = names(grau_in),
 
 top10_in <- grau_in %>%
   arrange(-grau_in) %>%
-  top_n(10)
+  top_n(10); top10_in
 
 # Centralidade de grau de saída
 grau_out <- degree(rt_graph, mode = 'out') # grau de SAÍDA
 grau_out <- data.frame(screen_name = names(grau_out), 
-                      grau_out = grau_out, row.names = NULL)
+                       grau_out = grau_out, row.names = NULL)
 
 top10_out <- grau_out %>%
   arrange(-grau_out) %>%
-  top_n(10)
+  top_n(10); top10_out
 
 # Centralidade de grau de intermediação
-grau_bet <- betweenness(rt_graph, directed = F, weights = NA, normalized = T)
-grau_bet <- data.frame(screen_name = names(grau_bet), 
-                       grau_bet = grau_bet, row.names = NULL)
+bet <- betweenness(rt_graph, directed = F, weights = NA, normalized = T)
+bet <- data.frame(screen_name = names(bet), 
+                  bet = bet, row.names = NULL)
 
-top10_bet <- grau_bet %>%
-  arrange(-grau_bet) %>%
-  top_n(10)
+top10_bet <- bet %>%
+  arrange(-bet) %>%
+  top_n(10); top10_bet
 
 # 3) Quantos componentes tem a rede #####
 
@@ -136,12 +137,13 @@ usuarios_centrais <- c(top10_in$screen_name,
   unique()
 
 # como no item 4, filtramos as interacoes que envolvem bots
-# mas tb filtramos a partir disso, as intreacoes que envolvem os usuariocs centrais
+# mas tb filtramos a partir disso, as interacoes que envolvem os usuarios centrais
 interacoes_centrais_bots <- rts %>%
   filter(fonte %in% nos_bots$`Perfil Twitter` |
            username %in% nos_bots$`Perfil Twitter`) %>%
   filter(fonte %in% usuarios_centrais |
            username %in% usuarios_centrais)
+
 nrow(interacoes_centrais_bots) # número de interações
 percent(nrow(interacoes_centrais_bots)/nrow(rts)) # porcentagem em relação ao total
 
