@@ -12,10 +12,10 @@ library(readr)
 
 # Base de dados -----------------------------------------------------------
 
-base <- read_csv("./capacitacao-jornalistas-main/all_#FechadoComBolsonaro2022_2021-06-14 00:00:00_1623963801.csv",
+base <- read_csv("./capacitacao-jornalistas-main/Dados/all_#FechadoComBolsonaro2022_2021-06-14 00:00:00_1623963801.csv",
                  col_types = cols(.default = "c"))
 
-resultados <- read_csv("./capacitacao-jornalistas-main/Handles-.fechadocombolsonaro2022-1623963801-resultados.csv")
+resultados <- read_csv("./capacitacao-jornalistas-main/Dados/Handles-.fechadocombolsonaro2022-1623963801-resultados.csv")
 
 
 # Analise Exploratoria ----------------------------------------------------
@@ -92,8 +92,8 @@ ntweets
 
 # Calcular a porcentagem de cada um
 library(scales)
-percent(ntweets/n_tweets)
-percent(nretweets/n_tweets)
+percent(ntweets/ntweets)
+percent(nretweets/ntweets)
 
 # 10) Apresentar uma visualização gráfica da evolução desses tweets no tempo,
 # indicando o dia com mais tweets contendo a hashtag.
